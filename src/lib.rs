@@ -117,6 +117,7 @@ quick_error! {
         ServiceInstanceResolutionFailed(service_name: String) {
             display("Unable to resolve service '{}' to a concrete list of addresses and ports for its instances via consul.", service_name)
         }
+        #[cfg(feature = "ureq")]
         /// An error from ureq occured.
         UReqError(err: ureq::Error) {
             display("UReq error: {}", err)
@@ -179,6 +180,7 @@ impl Config {
 /// Represents a lock against Consul.
 /// The lifetime of this object defines the validity of the lock against consul.
 /// When the object is dropped, the lock is attempted to be released for the next consumer.
+#[cfg(feature = "ureq")]
 #[derive(Clone, Debug)]
 pub struct Lock<'a> {
     /// The session ID of the lock.
@@ -197,6 +199,7 @@ pub struct Lock<'a> {
     pub consul: &'a Consul,
 }
 
+#[cfg(feature = "ureq")]
 impl Drop for Lock<'_> {
     fn drop(&mut self) {
         let req = CreateOrUpdateKeyRequest {
@@ -392,6 +395,7 @@ impl Consul {
     /// A tuple of a boolean and a 64 bit unsigned integer representing whether the operation was successful and the index for a subsequent blocking query.
     /// # Errors:
     /// [ConsulError](consul::ConsulError) describes all possible errors returned by this api.
+    #[cfg(feature = "ureq")]
     pub fn create_or_update_key_sync(
         &self,
         request: CreateOrUpdateKeyRequest<'_>,
@@ -486,6 +490,7 @@ impl Consul {
     /// - request - the [LockRequest](consul::types::LockRequest)
     /// # Errors:
     /// [ConsulError](consul::ConsulError) describes all possible errors returned by this api.
+    #[cfg(feature = "ureq")]
     pub async fn get_lock(&self, request: LockRequest<'_>, value: &[u8]) -> Result<Lock<'_>> {
         let session = self.get_session(request).await?;
         let req = CreateOrUpdateKeyRequest {
@@ -743,6 +748,7 @@ impl Consul {
         req.uri(url)
     }
 
+    #[cfg(feature = "ureq")]
     async fn get_session(&self, request: LockRequest<'_>) -> Result<SessionResponse> {
         let session_req = CreateSessionRequest {
             lock_delay: request.lock_delay,

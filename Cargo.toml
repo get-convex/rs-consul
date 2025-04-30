@@ -11,9 +11,11 @@ license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
-default = []
+default = ["ureq", "rustls-ring"]
 metrics = []
 trace = ["dep:opentelemetry"]
+rustls-ring = ["hyper-rustls/ring"]
+rustls-aws-lc = ["hyper-rustls/aws-lc-rs"]
 
 # keep this list sorted!
 [dependencies]
@@ -21,8 +23,16 @@ base64 = "0.22"
 http = "1"
 http-body-util = "0.1"
 hyper = { version = "1", features = ["full"] }
-hyper-rustls = { version = "0.27", default-features = false, features = ["webpki-roots", "http1"] }
-hyper-util = { version = "0.1", features = ["client", "client-legacy", "tokio", "http2"] }
+hyper-rustls = { version = "0.27", default-features = false, features = [
+    "webpki-roots",
+    "http1",
+] }
+hyper-util = { version = "0.1", features = [
+    "client",
+    "client-legacy",
+    "tokio",
+    "http2",
+] }
 opentelemetry = { version = "0.28", optional = true }
 quick-error = "2"
 serde = { version = "1.0", features = ["derive"] }
@@ -30,4 +40,4 @@ serde_json = "1.0"
 slog-scope = "4"
 smart-default = "0.7"
 tokio = { version = "1", features = ["full"] }
-ureq = { version = "3", features = ["json"] }
+ureq = { version = "3", features = ["json"], optional = true }
